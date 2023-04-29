@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   //ссылка на аватарку
   avatar: {
-    //required: true,
+    required: true,
     type: String,
   },
 });

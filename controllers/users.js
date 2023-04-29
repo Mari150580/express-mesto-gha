@@ -22,7 +22,7 @@ const getUser =(req, res) =>{
    })
   .then((user) => res.status(200).send({data:user}))
   .catch((err) =>{
-    res.status(ERROR_SERVER).send({message:`Internal server error ${err}`})
+    res.status(400).send({message:`Internal server error ${err}`})
   });
 };
 
