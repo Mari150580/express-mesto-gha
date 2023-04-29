@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   },
   //информация о пользователе
   about: {
-    //required: true,
+    required: true,
     type: String,
     minlength: 2,
     maxlength: 30,
