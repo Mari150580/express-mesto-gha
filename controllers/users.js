@@ -22,7 +22,11 @@ const getUser =(req, res) =>{
    })
   .then((user) => res.status(200).send({data:user}))
   .catch((err) =>{
-    res.status(404).send({message:`Internal server error ${err}`})
+    if(err.message === "User not found") {
+    res.status(404).send({message:`"Not found" ${err}`});
+    } else {
+      res.status(ERROR_SERVER).send({message:`Error creating user ${err}`})
+    }
   });
 };
 
