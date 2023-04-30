@@ -23,9 +23,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('*', (req, res) => {
+/*app.use('*', (req, res) => {
   res.status(404).send({message:`Error creating user ${err}`});
-});
+});*/
 
 // подключаем мидлвары, роуты и всё остальное...
 app.use('/', usersRouter); // Подключаем роутеры
