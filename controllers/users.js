@@ -27,7 +27,7 @@ const getUser =(req, res) =>{
     res.status(200).send({data:user})
   })
   .catch((err) =>{
-    if(err.message === "User not found") {
+    if(err.message === "Not ghg found") {
     res.status(404).send({message:`"Not found" ${err}`});
     } else {
       res.status(ERROR_SERVER).send({message:`Error creating user ${err}`})
