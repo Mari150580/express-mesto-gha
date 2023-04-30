@@ -17,10 +17,15 @@ const createUser = (req, res) => {
 const getUser =(req, res) =>{
   return User.findById(req.params.userId)
    //выкидывает ошибку если пользователь не найден
-   .orFail(() =>{
+   /*.orFail(() =>{
     throw new Error("User not found");
-   })
-  .then((user) => res.status(200).send({data:user}))
+   })*/
+  .then((user) => {
+    if(!user) {
+      res.status(400).send({message:`"Not ghg found" ${err}`});
+    }
+    res.status(200).send({data:user})
+  })
   .catch((err) =>{
     if(err.message === "User not found") {
     res.status(404).send({message:`"Not found" ${err}`});
