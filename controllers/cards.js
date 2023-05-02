@@ -5,7 +5,7 @@ const {ERROR_CODE, ERROR_SERVER} = require("../config")
 
 const createCard = (req, res) => {
   const {name, link} = req.body;
-  return Card.create({name, link, likes, owner: req.user._id})
+  return Card.create({name, link, owner: req.user._id})
   .then((card) => res.status(201).send({data: card}))
   .catch((err) => {
   if(err.name === "ValidationError") {
@@ -81,7 +81,7 @@ const dislikeCard = (req, res) => {
     if(!card) {
       throw new Error("User not found");
     }
-    res.status(200).send({data: card});
+    res.status(201).send({data: card});
 })
     .catch((err) =>{
       // проверка _id не валидный
