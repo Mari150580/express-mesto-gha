@@ -28,10 +28,11 @@ app.use((req, res, next) => {
 app.use('/', usersRouter); // Подключаем роутеры
 app.use('/', cardsRouter);
 
-app.use('*', (req, res) => {
-  res.status(404).send({message:`URL does not exist ${err}`});
-});
-
 app.listen(PORT, () =>{
   console.log(`App listening on port ${PORT}`)
+});
+
+app.use('*', (req, res) => {
+  res.status(404).send({message:`URL does not exist ${ReferenceError}`});
+  console.log(err.name)
 });
