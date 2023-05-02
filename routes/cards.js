@@ -6,7 +6,7 @@ cardRouter.get('/cards', getCards); //возвращает все карточк
 cardRouter.delete('/cards/:cardId', deleteCard); //удаляет карточку по идентификатору
 cardRouter.post('/cards',  createCard); //создаёт карточку
 
-cardRouter.post('/cards/:cardId/likes',  likeCard);
+cardRouter.put('/cards/:cardId/likes',  likeCard);
 cardRouter.post('/cards/:cardId/likes',  dislikeCard);
 
 module.exports = cardRouter;

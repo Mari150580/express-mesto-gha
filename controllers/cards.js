@@ -37,9 +37,12 @@ const getCards =(req, res) =>{
 };
 
 const likeCard =(req, res) =>{
-  const {cardId} = req.params;
-  return Card.findByIdAndUpdate(cardId, {$addToSet: { likes: req.user._id }}, { new: true })
-  .then((card) => {res.status(201).send({data: card});
+
+  return Card.findByIdAndUpdate(req.params.cardId,
+    {$addToSet: { likes: req.user._id }},
+    { new: true })
+  .then((card) => {res.status(201).send({likes: req.user._id});
+  console.log({likes: req.user._id})
 })
   .catch((err) =>{
     res.status(ERROR_SERVER).send({message:`Internal server error ${err}`})
