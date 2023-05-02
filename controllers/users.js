@@ -22,15 +22,21 @@ const getUser =(req, res) =>{
    })*/
   .then((user) => {
     if(!user) {
-      res.status(400).send({message:`"Not ghg found" ${err}`});
+      throw new Error("User not found");
     }
     res.status(200).send({data:user})
   })
   .catch((err) =>{
-    if(err.message === "Not ghg found") {
-    res.status(404).send({message:`"Not found" ${err}`});
-    } else {
-      res.status(ERROR_SERVER).send({message:`Error creating user ${err}`})
+    // проверка _id не валидный
+    if(err.name === "CastError") {
+    res.status(400).send({message:`"Not found" ${err}`});
+    }
+    // проверка _id не существует в базе
+    if ( err.name === "Error") {
+      res.status(404).send({message:`"Not found" ${err}`});
+    }
+    else {
+      res.status(500).send({message:`Error здесь creating user ${err}`})
     }
   });
 };
