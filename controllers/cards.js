@@ -36,25 +36,27 @@ const getCards =(req, res) =>{
   });
 };
 
-const likeCard =(req, res) =>{
-
+const likeCard =(req, res) => {
   return Card.findByIdAndUpdate(req.params.cardId,
     {$addToSet: { likes: req.user._id }},
-    { new: true })
-  .then((card) => {res.status(201).send({likes: req.user._id});
-  console.log({likes: req.user._id})
+    { new: true, runValidators: true })
+
+  .then(() => {
+
+    res.status(201).send({likes: req.user._id});
+
 })
   .catch((err) =>{
      // проверка _id не валидный
-     if(err.name === "CastError") {
-      res.status(400).send({message:`"Not found" ${err}`});
-      }
-      // проверка _id не существует в базе
-      if ( err.name === "Error") {
-        res.status(404).send({message:`"Not found" ${err}`});
-      }
+    if(err.name === "CastError") {
+    res.status(400).send({message:`"Not found" ${err}`});
+    }
+    // проверка _id не существует в базе
+    if ( err.name === "Error") {
+      res.status(404).send({message:`"Not found" ${err}`});
+    }
     res.status(ERROR_SERVER).send({message:`Internal server error ${err}`})
-
+    console.log(err)
   });
 };
 
@@ -63,7 +65,16 @@ const dislikeCard = (req, res) => {
   return Card.findByIdAndRemove(cardId, {$pull: { likes: req.user._id }}, { new: true })
   .then((card) => {res.status(201).send({data: card});
 })
-  .catch((err) =>{
+
+    .catch((err) =>{
+      // проверка _id не валидный
+     if(err.name === "CastError") {
+     res.status(400).send({message:`"Not found" ${err}`});
+     }
+     // проверка _id не существует в базе
+     if ( err.name === "Error") {
+       res.status(404).send({message:`"Not found" ${err}`});
+     }
     res.status(ERROR_SERVER).send({message:`Internal server error ${err}`})
   });
 };
