@@ -16,10 +16,6 @@ const createUser = (req, res) => {
 
 const getUser =(req, res) =>{
   return User.findById(req.params.userId)
-   //выкидывает ошибку если пользователь не найден
-   /*.orFail(() =>{
-    throw new Error("User not found");
-   })*/
   .then((user) => {
     if(!user) {
       throw new Error("User not found");
@@ -36,7 +32,7 @@ const getUser =(req, res) =>{
       res.status(404).send({message:`"Not found" ${err}`});
     }
     else {
-      res.status(500).send({message:`Error здесь creating user ${err}`})
+      res.status(500).send({message:`Error creating user ${err}`})
     }
   });
 };
@@ -49,15 +45,20 @@ const getUsers =(req, res) =>{
   });
 };
 
-const editUserProfile =(req, res) =>{
+const editUserProfile =(req, res)  => {
   const {name, about} = req.body;
   const { _id: userId} = req.user;
   return User.findByIdAndUpdate(userId, {name, about}, { new: true, runValidators: true } )
   .then((user) => res.status(200).send({data: user}))
   .catch((err) =>{
-    res.status(ERROR_SERVER).send({message:`Internal server error ${err}`})
+    if(err.name === "ValidationError") {
+      res.status(ERROR_CODE).send({message:`Error validation user ${err}`})
+    }
+    res.status(ERROR_SERVER).send({message:`Internal здесь server error ${err}`})
   });
 };
+
+
 
 const editUserAvatar =(req, res) =>{
   const {avatar} = req.body;
