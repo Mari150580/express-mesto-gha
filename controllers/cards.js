@@ -45,7 +45,16 @@ const likeCard =(req, res) =>{
   console.log({likes: req.user._id})
 })
   .catch((err) =>{
+     // проверка _id не валидный
+     if(err.name === "CastError") {
+      res.status(400).send({message:`"Not found" ${err}`});
+      }
+      // проверка _id не существует в базе
+      if ( err.name === "Error") {
+        res.status(404).send({message:`"Not found" ${err}`});
+      }
     res.status(ERROR_SERVER).send({message:`Internal server error ${err}`})
+
   });
 };
 
