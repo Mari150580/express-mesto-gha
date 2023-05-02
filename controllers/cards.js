@@ -17,12 +17,23 @@ const createCard = (req, res) => {
 };
 
 const deleteCard =(req, res) =>{
-  return Card.findByIdAndDelete(req.params.cardId)
-  .orFail(() =>{
-    throw new Error("Card with this id does not exist");
-   })
-  .then((card) => res.status(200).send(card))
+  const {cardId} = req.params;
+  return Card.findByIdAndDelete(cardId)
+  .then((card) => {
+    if(!card) {
+      throw new Error("User not found");
+    }
+    res.status(200).send(card)
+  })
   .catch((err) =>{
+      // проверка _id не валидный
+      if(err.name === "CastError") {
+        res.status(400).send({message:`"Not found" ${err}`});
+        }
+        // проверка _id не существует в базе
+        if ( err.name === "Error") {
+          res.status(404).send({message:`"Not found" ${err}`});
+        }
     res.status(ERROR_SERVER).send({message:`Internal server error ${err}`})
   });
 };
