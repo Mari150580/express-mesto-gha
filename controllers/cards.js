@@ -23,7 +23,7 @@ const deleteCard =(req, res) =>{
     if(!card) {
       throw new Error("User not found");
     }
-    res.status(200).send()
+    res.status(200).send(card)
   })
   .catch((err) =>{
       // проверка _id не валидный
