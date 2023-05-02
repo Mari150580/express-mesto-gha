@@ -37,13 +37,16 @@ const getCards =(req, res) =>{
 };
 
 const likeCard =(req, res) => {
-  return Card.findByIdAndUpdate(req.params.cardId,
+  const {cardId} = req.params;
+  return Card.findByIdAndUpdate(cardId,
     {$addToSet: { likes: req.user._id }},
     { new: true, runValidators: true })
 
-  .then(() => {
-
-    res.status(201).send({likes: req.user._id});
+  .then((card) => {
+    if(!card) {
+      throw new Error("User not found");
+    }
+    res.status(201).send({data: card});
 
 })
   .catch((err) =>{
@@ -62,10 +65,13 @@ const likeCard =(req, res) => {
 
 const dislikeCard = (req, res) => {
   const {cardId} = req.params;
-  return Card.findByIdAndRemove(cardId, {$pull: { likes: req.user._id }}, { new: true })
-  .then((card) => {res.status(201).send({data: card});
+  return Card.findByIdAndRemove(cardId, {$pull: { likes: req.user._id }}, { new: true, runValidators: true })
+  .then((card) => {
+    if(!card) {
+      throw new Error("User not found");
+    }
+    res.status(201).send({data: card});
 })
-
     .catch((err) =>{
       // проверка _id не валидный
      if(err.name === "CastError") {
