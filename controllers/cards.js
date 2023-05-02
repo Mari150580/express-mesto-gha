@@ -4,8 +4,10 @@ const {ERROR_CODE, ERROR_SERVER} = require("../config")
 
 
 const createCard = (req, res) => {
-  const {name, link} = req.body;
-  return Card.create({name, link, owner: req.user._id})
+  const owner = req.user._id;
+  const { name, link, likes = [], createdAt = Date.now() } = req.body;
+  //const {name, link} = req.body;
+  return Card.create({name, link, owner, likes, createdAt})
   .then((card) => res.status(201).send({data: card}))
   .catch((err) => {
   if(err.name === "ValidationError") {
