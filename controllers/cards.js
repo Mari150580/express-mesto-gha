@@ -23,7 +23,7 @@ const deleteCard =(req, res) =>{
     if(!card) {
       throw new Error("User not found");
     }
-    res.status(200).send(card)
+    res.status(200).send()
   })
   .catch((err) =>{
       // проверка _id не валидный
@@ -76,7 +76,7 @@ const likeCard =(req, res) => {
 
 const dislikeCard = (req, res) => {
   const {cardId} = req.params;
-  return Card.findByIdAndRemove(cardId, {$pull: { likes: req.user._id }}, { new: true, runValidators: true })
+  return Card.findByIdAndUpdate(cardId, {$pull: { likes: req.user._id }}, { new: true, runValidators: true })
   .then((card) => {
     if(!card) {
       throw new Error("User not found");
