@@ -81,7 +81,7 @@ const dislikeCard = (req, res) => {
     if(!card) {
       throw new Error("User not found");
     }
-    res.status(201).send({data: card});
+    res.status(200).send({data: card});
 })
     .catch((err) =>{
       // проверка _id не валидный
