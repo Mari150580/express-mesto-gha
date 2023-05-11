@@ -1,26 +1,26 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  //имя пользователя
+  // имя пользователя
   name: {
     required: true,
     type: String,
     minlength: 2,
     maxlength: 30,
   },
-  //информация о пользователе
+  // информация о пользователе
   about: {
     required: true,
     type: String,
     minlength: 2,
     maxlength: 30,
   },
-  //ссылка на аватарку
+  // ссылка на аватарку
   avatar: {
     required: true,
     type: String,
   },
 });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('user', userSchema);
 module.exports = User;

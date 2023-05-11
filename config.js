@@ -1,4 +1,5 @@
 const ERROR_CODE = 400;
 const ERROR_SERVER = 500;
+const ERROR_NOTFOUND = 404;
 
-module.exports = {ERROR_CODE, ERROR_SERVER}
+module.exports = { ERROR_CODE, ERROR_SERVER, ERROR_NOTFOUND };

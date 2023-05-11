@@ -1,73 +1,78 @@
-const User = require("../models/user");
-const {ERROR_CODE, ERROR_SERVER} = require("../config")
+const User = require('../models/user');
+const { ERROR_CODE, ERROR_SERVER, ERROR_NOTFOUND } = require('../config');
 
 const createUser = (req, res) => {
-  const {name, about, avatar} = req.body;
-  return User.create({name, about, avatar})
-  .then((user) => res.status(201).send({data: user}))
-  .catch((err) => {
-  if(err.name === "ValidationError") {
-    res.status(ERROR_CODE).send({message:`Error validation user ${err}`})
-  } else {
-  res.status(ERROR_SERVER).send({message:`Error creating user ${err}`})
-  }
-});
+  const { name, about, avatar } = req.body;
+  return User.create({ name, about, avatar })
+    .then((user) => res.status(201).send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_CODE).send({ message: 'Error validation user' });
+      } else {
+        res.status(ERROR_SERVER).send({ message: 'Error creating user' });
+      }
+    });
 };
 
-const getUser =(req, res) =>{
-  return User.findById(req.params.userId)
-  .then((user) => {
-    if(!user) {
-      throw new Error("User not found");
-    }
-    res.status(200).send({data:user})
-  })
-  .catch((err) =>{
-    // проверка _id не валидный
-    if(err.name === "CastError") {
-    res.status(400).send({message:`"Not found" ${err}`});
-    }
-    // проверка _id не существует в базе
-    if ( err.name === "Error") {
-      res.status(404).send({message:`"Not found" ${err}`});
-    }
-    else {
-      res.status(500).send({message:`Error creating user ${err}`})
-    }
-  });
+const getUser = (req, res) => {
+  User.findById(req.params.userId)
+    . then((user) => {
+      if (!user) {
+        throw new Error('User not found');
+      }
+      res.status(200).send({ data: user });
+    })
+    .catch((err) => {
+      // проверка _id не валидный
+      if (err.name === 'CastError') {
+        res.status(ERROR_CODE).send({ message: 'Not found' });
+      } else if (err.name === 'Error') { // проверка _id не существует в базе
+        res.status(ERROR_NOTFOUND).send({ message: 'Not found' });
+      } else {
+        res.status(ERROR_SERVER).send({ message: 'Error creating user' });
+      }
+    });
 };
 
-const getUsers =(req, res) =>{
-  return User.find({})
-  .then((users) => res.status(200).send(users))
-  .catch((err) =>{
-    res.status(ERROR_SERVER).send({message:`Internal server error ${err}`})
-  });
+const getUsers = (req, res) => {
+  User.find({})
+    .then((users) => res.status(200).send(users))
+    .catch(() => {
+      res.status(ERROR_SERVER).send({ message: 'Internal server error' });
+    });
 };
 
-const editUserProfile =(req, res)  => {
-  const {name, about} = req.body;
-  const { _id: userId} = req.user;
-  return User.findByIdAndUpdate(userId, {name, about}, { new: true, runValidators: true } )
-  .then((user) => res.status(200).send({data: user}))
-  .catch((err) =>{
-    if(err.name === "ValidationError") {
-      res.status(ERROR_CODE).send({message:`Error validation user ${err}`})
-    }
-    res.status(ERROR_SERVER).send({message:`Internal здесь server error ${err}`})
-  });
+const editUserProfile = (req, res) => {
+  const { name, about } = req.body;
+  const { _id: userId } = req.user;
+  return User.findByIdAndUpdate(
+    userId,
+    { name, about },
+    { new: true, runValidators: true },
+  )
+    .then((user) => res.status(200).send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_CODE).send({ message: 'Error validation user' });
+      }
+      res.status(ERROR_SERVER).send({ message: 'Internal здесь server error' });
+    });
 };
 
-
-
-const editUserAvatar =(req, res) =>{
-  const {avatar} = req.body;
-  const { _id: userId} = req.user;
-  return User.findByIdAndUpdate(userId, {avatar}, { new: true, runValidators: true } )
-  .then((user) => res.status(200).send({data: user}))
-  .catch((err) =>{
-    res.status(ERROR_SERVER).send({message:`Internal server error ${err}`})
-  });
+const editUserAvatar = (req, res) => {
+  const { avatar } = req.body;
+  const { _id: userId } = req.user;
+  return User.findByIdAndUpdate(userId, { avatar }, { new: true })
+    .then((user) => res.status(200).send({ data: user }))
+    .catch(() => {
+      res.status(ERROR_SERVER).send({ message: 'Internal server error' });
+    });
 };
 
-module.exports ={createUser, getUser, getUsers, editUserProfile, editUserAvatar};
+module.exports = {
+  createUser,
+  getUser,
+  getUsers,
+  editUserProfile,
+  editUserAvatar,
+};
