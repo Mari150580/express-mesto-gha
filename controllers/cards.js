@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const { ERROR_CODE, ERROR_SERVER, ERROR_NOTFOUND } = require('../config');
+const { ERROR_BAD_REQUEST, ERROR_SERVER, ERROR_NOT_FOUND } = require('../config');
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
@@ -7,7 +7,7 @@ const createCard = (req, res) => {
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE).send({ message: 'Error validation card' });
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation card' });
       } else {
         res.status(ERROR_SERVER).send({ message: 'Error creating card' });
       }
@@ -26,9 +26,9 @@ const deleteCard = (req, res) => {
     .catch((err) => {
       // проверка _id не валидный
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE).send({ message: 'Not found' });
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Not found' });
       } else if (err.name === 'Error') { // проверка _id не существует в базе
-        res.status(ERROR_NOTFOUND).send({ message: 'Not found' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Not found' });
       } else {
         res.status(ERROR_SERVER).send({ message: 'Internal server error' });
       }
@@ -59,9 +59,9 @@ const likeCard = (req, res) => {
     .catch((err) => {
       // проверка _id не валидный
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE).send({ message: 'Not found' });
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Not found' });
       } else if (err.name === 'Error') { // проверка _id не существует в базе
-        res.status(ERROR_NOTFOUND).send({ message: 'Not found' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Not found' });
       } else {
         res.status(ERROR_SERVER).send({ message: 'Internal server error' });
       }
@@ -84,9 +84,9 @@ const dislikeCard = (req, res) => {
     .catch((err) => {
       // проверка _id не валидный
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE).send({ message: 'Not found' });
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Not found' });
       } else if (err.name === 'Error') { // проверка _id не существует в базе
-        res.status(ERROR_NOTFOUND).send({ message: 'Not found' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Not found' });
       } else {
         res.status(ERROR_SERVER).send({ message: 'Internal server error' });
       }

@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const { ERROR_CODE, ERROR_SERVER, ERROR_NOTFOUND } = require('../config');
+const { ERROR_BAD_REQUEST, ERROR_SERVER, ERROR_NOT_FOUND } = require('../config');
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -7,7 +7,7 @@ const createUser = (req, res) => {
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE).send({ message: 'Error validation user' });
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
       } else {
         res.status(ERROR_SERVER).send({ message: 'Error creating user' });
       }
@@ -25,9 +25,9 @@ const getUser = (req, res) => {
     .catch((err) => {
       // проверка _id не валидный
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE).send({ message: 'Not found' });
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Not found' });
       } else if (err.name === 'Error') { // проверка _id не существует в базе
-        res.status(ERROR_NOTFOUND).send({ message: 'Not found' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Not found' });
       } else {
         res.status(ERROR_SERVER).send({ message: 'Error creating user' });
       }
@@ -53,7 +53,7 @@ const editUserProfile = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE).send({ message: 'Error validation user' });
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
       }
       res.status(ERROR_SERVER).send({ message: 'Internal здесь server error' });
     });
@@ -62,10 +62,14 @@ const editUserProfile = (req, res) => {
 const editUserAvatar = (req, res) => {
   const { avatar } = req.body;
   const { _id: userId } = req.user;
-  return User.findByIdAndUpdate(userId, { avatar }, { new: true })
+  return User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => res.status(200).send({ data: user }))
-    .catch(() => {
-      res.status(ERROR_SERVER).send({ message: 'Internal server error' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
+      } else {
+        res.status(ERROR_SERVER).send({ message: 'Internal server error' });
+      }
     });
 };
 

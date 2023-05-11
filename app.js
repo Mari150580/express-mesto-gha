@@ -3,6 +3,7 @@ const express = require('express');
 /* const path = require('path'); */
 const usersRouter = require('./routes/users'); // импортируем роутер
 const cardsRouter = require('./routes/cards');
+const { ERROR_NOT_FOUND } = require('./config');
 
 const app = express();
 
@@ -29,7 +30,7 @@ app.use('/', usersRouter); // Подключаем роутеры
 app.use('/', cardsRouter);
 
 app.use('*', (req, res) => {
-  res.status(404).send({ message: 'URL does not exist' });
+  res.status(ERROR_NOT_FOUND).send({ message: 'URL does not exist' });
 });
 
 app.listen(PORT, () => {
