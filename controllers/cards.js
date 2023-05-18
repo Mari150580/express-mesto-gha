@@ -25,7 +25,7 @@ const deleteCard = async (req, res, next) => {
       res.status(ERROR_NOT_FOUND).send({ message: 'Ошибка доступа! Карточка с данным не принадлежит пользователю' });
     } else {
       return res
-        .status(201)
+        .status(200)
         .send({ message: 'Карточка удалена успешно и без ошибок' });
     }
   } catch (err) {
