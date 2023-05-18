@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (v) => isURL.test(v),
+      validator: (v) => isURL(v),
       message: 'Вы ввели неправильный формат ссылки (невалидно)',
     },
     default:

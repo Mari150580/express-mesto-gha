@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
+const validationErrors = require('celebrate').errors;
 
 const User = require('../models/user');
 const { ERROR_BAD_REQUEST, ERROR_NOT_FOUND, USER_EXISTS, INCORRECT_DATA } = require('../config');
@@ -15,7 +16,9 @@ const createUser = (req, res, next) => {
       } else if (err.code === 11000) { // проверка на индивидуальность email
         res.status(USER_EXISTS).send({ message: 'Пользователь с такими данными уже существует' });
       } else if (err.name === 'Error') {
-        res.status(400).send({ message: 'Error validation' });
+        res.status(400).send({ message: 'Error validation00' });
+      } else if (err.name === 'validationErrors') {
+        res.status(400).send({ message: 'Error validation user11' });
       } else {
         next(err);
       }
