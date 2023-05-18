@@ -1,20 +1,26 @@
-const User = require('../models/user');
-const { ERROR_BAD_REQUEST, ERROR_SERVER, ERROR_NOT_FOUND } = require('../config');
+const bcrypt = require('bcrypt');
+const jsonwebtoken = require('jsonwebtoken');
 
-const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  return User.create({ name, about, avatar })
-    .then((user) => res.status(201).send({ data: user }))
+const User = require('../models/user');
+const { ERROR_BAD_REQUEST, ERROR_NOT_FOUND, USER_EXISTS, INCORRECT_DATA } = require('../config');
+
+const createUser = (req, res, next) => {
+  const { name, about, avatar, email, password } = req.body;
+  bcrypt.hash(password, 10)
+    .then ((hash) => User.create({ name, about, avatar, email, password: hash }))
+    .then((user) => res.status(201).send({ user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
+      } else if (err.code === 11000) { // проверка на индивидуальность email
+        res.status(USER_EXISTS).send({ message: 'Пользователь с такими данными уже существует' });
       } else {
-        res.status(ERROR_SERVER).send({ message: 'Error creating user' });
+        next(err);
       }
     });
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     . then((user) => {
       if (!user) {
@@ -27,26 +33,27 @@ const getUser = (req, res) => {
       if (err.name === 'CastError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Not found' });
       } else if (err.name === 'Error') { // проверка _id не существует в базе
-        res.status(ERROR_NOT_FOUND).send({ message: 'Not found' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Not found000' });
       } else {
-        res.status(ERROR_SERVER).send({ message: 'Error creating user' });
+        next(err);
       }
     });
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch(() => {
-      res.status(ERROR_SERVER).send({ message: 'Internal server error' });
+    .catch((err) => {
+      next(err);
     });
 };
 
-const editUserProfile = (req, res) => {
+
+const editUserProfile = (req, res, next) => {
   const { name, about } = req.body;
-  const { _id: userId } = req.user;
+  // const { _id: userId } = req.params.user;
   return User.findByIdAndUpdate(
-    userId,
+    req.params.userId,
     { name, about },
     { new: true, runValidators: true },
   )
@@ -55,22 +62,68 @@ const editUserProfile = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
       }
-      res.status(ERROR_SERVER).send({ message: 'Internal здесь server error' });
+      next(err);
     });
 };
 
-const editUserAvatar = (req, res) => {
+const editUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  const { _id: userId } = req.user;
-  return User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
-    .then((user) => res.status(200).send({ data: user }))
+  return User.findByIdAndUpdate(req.params.userId, avatar, { new: true, runValidators: true })
+    .then(() => res.status(200).send({ avatar }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
       } else {
-        res.status(ERROR_SERVER).send({ message: 'Internal server error' });
+        next(err);
       }
     });
+};
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  // data.token, сроком на неделю, сверка паролей
+  User
+    .findOne({ email }).select('+password')
+    .orFail(() => res.status(INCORRECT_DATA).send({ message: 'Пользователь не найден' }))
+    .then((user) => bcrypt.compare(password, user.password)
+      .then((matched) => {
+        if (matched) {
+          return user;
+        }
+        res.status(INCORRECT_DATA).send({ message: 'Пользователь не найден' });
+      }))
+    .then((user) => {
+      const token = jsonwebtoken.sign( {_id: user._id }, 'secret', { expiresIn: '7d' });
+      res.status(200).send({ user, token });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+const getInformationUsers = (req, res, next) => {
+  const { authorization } = req.headers;
+  console.log(req.headers);
+  if (!authorization || !authorization.startsWith('Bearer')) {
+    res.status(401).send({ message: 'Необходима авторизация' });
+  }
+
+  let payload;
+  const token = authorization.replace('Bearer ', '');
+  try {
+    payload = jsonwebtoken.verify(token, 'secret');
+  } catch (err) {
+    res.status(401).send({ message: 'Необходима авторизация' });
+  }
+  req.user = payload;
+  console.log(payload);
+  User
+    .findById(payload._id)
+    .orFail(() => res.status(404).send({ message: 'Пользователь не найден' }))
+    .then((user) => res.send(user))
+    .catch((err) =>
+  console.log(err)
+    )
 };
 
 module.exports = {
@@ -79,4 +132,6 @@ module.exports = {
   getUsers,
   editUserProfile,
   editUserAvatar,
+  login,
+  getInformationUsers,
 };

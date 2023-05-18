@@ -1,19 +1,22 @@
 const express = require('express');
+const auth = require('../middlewares/auth');
 
 const cardRouter = express.Router();
 const {
-  createUser,
   getUser,
   getUsers,
   editUserProfile,
   editUserAvatar,
+  getInformationUsers,
 } = require('../controllers/users');
 
-cardRouter.get('/users', getUsers);
+cardRouter.get('/users', auth, getUsers);
 cardRouter.get('/users/:userId', getUser);
-cardRouter.post('/users', createUser);
+cardRouter.get('/users/me', getInformationUsers);
 
 cardRouter.patch('/users/me', editUserProfile);
 cardRouter.patch('/users/me/avatar', editUserAvatar);
+
+// cardRouter.use(auth); // защита роутов
 
 module.exports = cardRouter;
