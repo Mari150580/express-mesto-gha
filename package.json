@@ -20,6 +20,7 @@
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.5",
+    "objectid": "^3.2.1",
     "payload": "^1.8.2",
     "unique": "^0.0.1",
     "url-regex": "^5.0.0",
