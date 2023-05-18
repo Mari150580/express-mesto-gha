@@ -3,6 +3,7 @@ const express = require('express');
 const { celebrate, Joi } = require('celebrate');
 /* const path = require('path'); */
 const BodyParser = require('body-parser');
+const validationErrors = require('celebrate').errors;
 
 const usersRouter = require('./routes/users'); // импортируем роутер
 const cardsRouter = require('./routes/cards');
@@ -19,7 +20,6 @@ const { PORT = 3000 } = process.env;
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(express.json());
-
 // app.use(express.static(path.join(__dirname, "pablic"))); для подключения фронта
 
 // подключаем мидлвары, роуты и всё остальное...
@@ -47,7 +47,9 @@ app.use('*', (req, res) => {
   res.status(ERROR_NOT_FOUND).send({ message: 'URL does not exist' });
 });
 
+app.use(validationErrors());
 app.use(errorHandler);
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });

@@ -14,6 +14,8 @@ const createUser = (req, res, next) => {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
       } else if (err.code === 11000) { // проверка на индивидуальность email
         res.status(USER_EXISTS).send({ message: 'Пользователь с такими данными уже существует' });
+      } else if (err.name === 'Error') {
+        res.status(400).send({ message: 'Error validation' });
       } else {
         next(err);
       }
