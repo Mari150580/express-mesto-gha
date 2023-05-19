@@ -14,7 +14,7 @@ const {
 
 cardRouter.get('/', auth, getUsers);
 
-cardRouter.get('/me', getInformationUsers);
+cardRouter.get('/me', auth, getInformationUsers);
 
 cardRouter.get('/:userId', celebrate({
   params: Joi.object().keys({
@@ -33,7 +33,5 @@ cardRouter.patch('/me/avatar', celebrate({
     avatar: Joi.string().regex(URL_REGEXP),
   }),
 }), editUserAvatar);
-
-// cardRouter.use(auth); // защита роутов
 
 module.exports = cardRouter;

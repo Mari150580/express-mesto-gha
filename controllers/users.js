@@ -131,7 +131,7 @@ const login = (req, res, next) => {
 };
 
 const getInformationUsers = (req, res, next) => {
-  const userId = req.body._id;
+  const userId = req.user._id;
   User
     .findById(userId)
     .orFail(() => res.status(404).send({ message: 'Пользователь не найден' }))
