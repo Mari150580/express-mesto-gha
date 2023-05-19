@@ -1,6 +1,6 @@
 const express = require('express');
-const auth = require('../middlewares/auth');
 const { celebrate, Joi } = require('celebrate');
+const auth = require('../middlewares/auth');
 const { URL_REGEXP } = require('../config');
 
 const cardRouter = express.Router();
@@ -41,9 +41,3 @@ cardRouter.delete('/:cardId/likes', celebrate({
 }), dislikeCard);
 
 module.exports = cardRouter;
-/*  "name": "hghhhggbxbfgghgf",
-        "link": "fgfggcbxxfhgfgghgfhgfh",
-        "owner": "6465e22d54c76bfb8d8a1954",
-        "likes": [],
-        "_id": "6465e742b0c2e0d77f6d25e8",
-        "createdAt": "2023-05-18T08:52:18.247Z", */

@@ -1,6 +1,6 @@
 const express = require('express');
-const auth = require('../middlewares/auth');
 const { celebrate, Joi } = require('celebrate');
+const auth = require('../middlewares/auth');
 const { URL_REGEXP } = require('../config');
 
 const cardRouter = express.Router();
@@ -37,9 +37,3 @@ cardRouter.patch('/me/avatar', celebrate({
 // cardRouter.use(auth); // защита роутов
 
 module.exports = cardRouter;
-
-/* "name": "Жак1",
-        "about": "Исследователь",
-        "avatar": "http://kadet39.ru/wp-",
-        "email": "hgfgfth@djjjhjghghfjgjr.ru",
-        "password": "fhgfhgfghghghhdghdgd" */

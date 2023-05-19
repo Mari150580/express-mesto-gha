@@ -13,7 +13,7 @@ const createCard = (req, res, next) => {
       }
     });
 };
-
+// eslint-disable-next-line consistent-return
 const deleteCard = async (req, res, next) => {
   try {
     const findedCard = await Card.findById(req.params.cardId).orFail();

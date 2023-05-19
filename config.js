@@ -12,5 +12,4 @@ module.exports = {
   INCORRECT_DATA,
   URL_REGEXP,
 };
- // const URL_REGEXP = /http[s]?:\/\/(www\.)?[\w\d\-\._~:\/?#\[\]@!\$&'()*+,;=]+#?/im;
-
+// const URL_REGEXP = /http[s]?:\/\/(www\.)?[\w\d\-\._~:\/?#\[\]@!\$&'()*+,;=]+#?/im;

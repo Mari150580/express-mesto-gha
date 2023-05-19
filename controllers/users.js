@@ -2,12 +2,29 @@ const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
 
 const User = require('../models/user');
-const { ERROR_BAD_REQUEST, ERROR_NOT_FOUND, USER_EXISTS, INCORRECT_DATA } = require('../config');
+const {
+  ERROR_BAD_REQUEST,
+  ERROR_NOT_FOUND,
+  USER_EXISTS,
+  INCORRECT_DATA,
+} = require('../config');
 
 const createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
   bcrypt.hash(password, 10)
-    .then ((hash) => User.create({ name, about, avatar, email, password: hash }))
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((user) => {
       const dataUser = user.toObject();
       delete dataUser.password;
@@ -93,6 +110,7 @@ const login = (req, res, next) => {
     .findOne({ email }).select('+password')
     .orFail(() => res.status(INCORRECT_DATA).send({ message: 'Пользователь не найден' }))
     .then((user) => bcrypt.compare(password, user.password)
+    // eslint-disable-next-line consistent-return
       .then((matched) => {
         if (matched) {
           return user;
@@ -100,7 +118,11 @@ const login = (req, res, next) => {
         res.status(INCORRECT_DATA).send({ message: 'Пользователь не найден' });
       }))
     .then((user) => {
-      const token = jsonwebtoken.sign( {_id: user._id }, 'secret', { expiresIn: '7d' });
+      const token = jsonwebtoken.sign(
+        { _id: user._id },
+        'secret',
+        { expiresIn: '7d' },
+      );
       res.status(200).send({ user, token });
     })
     .catch((err) => {
@@ -109,7 +131,7 @@ const login = (req, res, next) => {
 };
 
 const getInformationUsers = (req, res, next) => {
- const userId = req.body._id;
+  const userId = req.body._id;
   User
     .findById(userId)
     .orFail(() => res.status(404).send({ message: 'Пользователь не найден' }))
