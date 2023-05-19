@@ -13,15 +13,16 @@ const {
 } = require('../controllers/users');
 
 cardRouter.get('/', auth, getUsers);
-/* cardRouter.get('/:userId', celebrate({
-  params: Joi.object().keys({
-    userId: Joi.string().required().hex().length(24),
-  }),
-}), getUser); */
 
 cardRouter.get('/me', getInformationUsers);
 
-/* cardRouter.patch('/me', celebrate({
+cardRouter.get('/:userId', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().required().hex().length(24),
+  }),
+}), getUser);
+
+cardRouter.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
@@ -32,7 +33,7 @@ cardRouter.patch('/me/avatar', celebrate({
     avatar: Joi.string().regex(URL_REGEXP),
   }),
 }), editUserAvatar);
-*/
+
 // cardRouter.use(auth); // защита роутов
 
 module.exports = cardRouter;
