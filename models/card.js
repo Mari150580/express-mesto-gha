@@ -17,7 +17,7 @@ const cardSchema = new mongoose.Schema({
     // ссылка на модель автора карточки
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: true,
+    required: [true, 'Поле `owner` является обязательным для заполнения'],
   },
   likes: {
     // список лайкнувших пост пользователей,

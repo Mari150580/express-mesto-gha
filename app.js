@@ -40,24 +40,10 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use('/users', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(URL_REGEXP),
-    email: Joi.string().email(),
-    password: Joi.string(),
-  }),
-}), usersRouter); // Подключаем роутеры
+app.use('/users', usersRouter); // Подключаем роутеры
 
-app.use('/cards', celebrate({
-  body:
-  Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().required().uri(),
-    owner: Joi.string().required().uri(),
-  }),
-}), cardsRouter);
+app.use('/cards', cardsRouter);
+
 app.use('*', (req, res) => {
   res.status(ERROR_NOT_FOUND).send({ message: 'URL does not exist' });
 });

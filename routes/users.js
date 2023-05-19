@@ -12,9 +12,9 @@ const {
   getInformationUsers,
 } = require('../controllers/users');
 
-cardRouter.get('/', getUsers);
+cardRouter.get('/', auth, getUsers);
 cardRouter.get('/:userId', celebrate({
-  body: Joi.object().keys({
+  params: Joi.object().keys({
     userId: Joi.string().required().hex().length(24),
   }),
 }), getUser);
