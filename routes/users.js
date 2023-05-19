@@ -10,13 +10,19 @@ const {
   getInformationUsers,
 } = require('../controllers/users');
 
-cardRouter.get('/users', auth, getUsers);
-cardRouter.get('/users/:userId', getUser);
-cardRouter.get('/users/me', getInformationUsers);
+cardRouter.get('/', auth, getUsers);
+cardRouter.get('/:userId', getUser);
+cardRouter.get('/me', getInformationUsers);
 
-cardRouter.patch('/users/me', editUserProfile);
-cardRouter.patch('/users/me/avatar', editUserAvatar);
+cardRouter.patch('/me', editUserProfile);
+cardRouter.patch('/me/avatar', editUserAvatar);
 
 // cardRouter.use(auth); // защита роутов
 
 module.exports = cardRouter;
+
+/* "name": "Жак1",
+        "about": "Исследователь",
+        "avatar": "http://kadet39.ru/wp-",
+        "email": "hgfgfth@djjjhjghghfjgjr.ru",
+        "password": "fhgfhgfghghghhdghdgd" */

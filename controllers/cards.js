@@ -7,7 +7,7 @@ const createCard = (req, res, next) => {
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation card' });
+        res.status(401).send({ message: 'Error validation card' });
       } else {
         next(err);
       }
