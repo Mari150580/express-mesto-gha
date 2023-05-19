@@ -19,16 +19,16 @@ const cardSchema = new mongoose.Schema({
     ref: 'user',
     required: [true, 'Поле `owner` является обязательным для заполнения'],
   },
+  createdAt: {
+    // дата создания
+    type: Date,
+    default: Date.now,
+  },
   likes: {
     // список лайкнувших пост пользователей,
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'user',
     default: [],
-  },
-  createdAt: {
-    // дата создания
-    type: Date,
-    default: Date.now,
   },
 });
 
