@@ -10,6 +10,7 @@ const cardsRouter = require('./routes/cards');
 const { ERROR_NOT_FOUND, URL_REGEXP } = require('./config');
 const { login, createUser } = require('./controllers/users');
 const errorHandler = require('./middlewares/error-handler');
+const limiter = require('./middlewares/limiter');
 
 const app = express();
 
@@ -20,6 +21,7 @@ const { PORT = 3000 } = process.env;
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(express.json());
+app.use(limiter);
 // app.use(express.static(path.join(__dirname, "pablic"))); для подключения фронта
 
 // подключаем мидлвары, роуты и всё остальное...
