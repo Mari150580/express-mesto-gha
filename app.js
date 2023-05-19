@@ -7,7 +7,7 @@ const validationErrors = require('celebrate').errors;
 
 const usersRouter = require('./routes/users'); // импортируем роутер
 const cardsRouter = require('./routes/cards');
-const { ERROR_NOT_FOUND } = require('./config');
+const { ERROR_NOT_FOUND, URL_REGEXP } = require('./config');
 const { login, createUser } = require('./controllers/users');
 const errorHandler = require('./middlewares/error-handler');
 
@@ -34,7 +34,7 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().uri(),
+    avatar: Joi.string().regex(URL_REGEXP),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
@@ -44,17 +44,18 @@ app.use('/users', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().uri(),
+    avatar: Joi.string().regex(URL_REGEXP),
     email: Joi.string().email(),
     password: Joi.string(),
   }),
 }), usersRouter); // Подключаем роутеры
 
 app.use('/cards', celebrate({
-  body: Joi.object().keys({
+  body:
+  Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().required(),
-    owner: Joi.string().required(),
+    link: Joi.string().required().uri(),
+    owner: Joi.string().required().uri(),
   }),
 }), cardsRouter);
 app.use('*', (req, res) => {
