@@ -1,5 +1,7 @@
 const express = require('express');
 const auth = require('../middlewares/auth');
+const { celebrate, Joi } = require('celebrate');
+const { URL_REGEXP } = require('../config');
 
 const cardRouter = express.Router();
 const {
@@ -10,12 +12,26 @@ const {
   getInformationUsers,
 } = require('../controllers/users');
 
-cardRouter.get('/', auth, getUsers);
-cardRouter.get('/:userId', getUser);
+cardRouter.get('/', getUsers);
+cardRouter.get('/:userId', celebrate({
+  body: Joi.object().keys({
+    userId: Joi.string().required().hex().length(24),
+  }),
+}), getUser);
+
 cardRouter.get('/me', getInformationUsers);
 
-cardRouter.patch('/me', editUserProfile);
-cardRouter.patch('/me/avatar', editUserAvatar);
+cardRouter.patch('/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+}), editUserProfile);
+cardRouter.patch('/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().regex(URL_REGEXP),
+  }),
+}), editUserAvatar);
 
 // cardRouter.use(auth); // защита роутов
 
