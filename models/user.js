@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const isURL = require('validator/lib/isURL');
-// const URL_REGEXP = /http[s]?:\/\/(www\.)?[\w\d\-\._~:\/?#\[\]@!\$&'()*+,;=]+#?/im;
 
 const userSchema = new mongoose.Schema({
   // имя пользователя
