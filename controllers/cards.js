@@ -22,14 +22,17 @@ const deleteCard = async (req, res, next) => {
       owner: req.user._id,
     });
     if (deletedCard.deletedCount === 0) {
-      res.status(ERROR_NOT_FOUND).send({ message: 'Ошибка доступа! Карточка с данным не принадлежит пользователю' });
+      res.status(403).send({ message: 'Ошибка доступа! Карточка с данным не принадлежит пользователю' });
     } else {
       return res
         .status(200)
         .send({ message: 'Карточка удалена успешно и без ошибок' });
     }
   } catch (err) {
-    return next(err);
+    if (err.name === 'DocumentNotFoundError') { // проверка _id не существует в базе
+      res.status(ERROR_NOT_FOUND).send({ message: 'Not found' });
+    }
+    next(err);
   }
 };
 

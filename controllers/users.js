@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
 
-
 const User = require('../models/user');
 const { ERROR_BAD_REQUEST, ERROR_NOT_FOUND, USER_EXISTS, INCORRECT_DATA } = require('../config');
 
@@ -57,7 +56,6 @@ const getUsers = (req, res, next) => {
     });
 };
 
-
 const editUserProfile = (req, res, next) => {
   const { name, about } = req.body;
   // const { _id: userId } = req.params.user;
@@ -111,28 +109,14 @@ const login = (req, res, next) => {
 };
 
 const getInformationUsers = (req, res, next) => {
-  const { authorization } = req.headers;
-  console.log(req.headers);
-  if (!authorization || !authorization.startsWith('Bearer')) {
-    res.status(401).send({ message: 'Необходима авторизация' });
-  }
-
-  let payload;
-  const token = authorization.replace('Bearer ', '');
-  try {
-    payload = jsonwebtoken.verify(token, 'secret');
-  } catch (err) {
-    res.status(401).send({ message: 'Необходима авторизация' });
-  }
-  req.user = payload;
-  console.log(payload);
+ const userId = req.body._id;
   User
-    .findById(payload._id)
+    .findById(userId)
     .orFail(() => res.status(404).send({ message: 'Пользователь не найден' }))
-    .then((user) => res.send(user))
-    .catch((err) =>
-  console.log(err)
-    )
+    .then((users) => res.status(200).send(users))
+    .catch((err) => {
+      next(err);
+    });
 };
 
 module.exports = {
