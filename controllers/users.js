@@ -2,12 +2,10 @@ const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
 
 const User = require('../models/user');
-const {
-  ERROR_BAD_REQUEST,
-  ERROR_NOT_FOUND,
-  USER_EXISTS,
-  INCORRECT_DATA,
-} = require('../config');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const UserExistsError = require('../errors/UserExistsError');
+const IncorrectDataError = require('../errors/IncorrectDataError');
 
 const createUser = (req, res, next) => {
   const {
@@ -32,13 +30,11 @@ const createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
+        next(new BadRequestError('Error validation user'));
       } else if (err.code === 11000) { // проверка на индивидуальность email
-        res.status(USER_EXISTS).send({ message: 'Пользователь с такими данными уже существует' });
+        next(new UserExistsError('Пользователь с такими данными уже существует'));
       } else if (err.name === 'Error') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation' });
-      } else if (err.name === 'validationErrors') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
+        next(new BadRequestError('Error validation'));
       } else {
         next(err);
       }
@@ -56,9 +52,9 @@ const getUser = (req, res, next) => {
     .catch((err) => {
       // проверка _id не валидный
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Not found' });
+        next(new BadRequestError('Not found'));
       } else if (err.name === 'Error') { // проверка _id не существует в базе
-        res.status(ERROR_NOT_FOUND).send({ message: 'Not found000' });
+        next(new NotFoundError('Not found'));
       } else {
         next(err);
       }
@@ -84,7 +80,7 @@ const editUserProfile = (req, res, next) => {
     .then(() => res.status(200).send({ name, about }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
+        next(new BadRequestError('Error validation user'));
       }
       next(err);
     });
@@ -96,7 +92,7 @@ const editUserAvatar = (req, res, next) => {
     .then(() => res.status(200).send({ avatar }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation user' });
+        next(new BadRequestError('Error validation user'));
       } else {
         next(err);
       }
@@ -108,14 +104,14 @@ const login = (req, res, next) => {
   // data.token, сроком на неделю, сверка паролей
   User
     .findOne({ email }).select('+password')
-    .orFail(() => res.status(INCORRECT_DATA).send({ message: 'Пользователь не найден' }))
+    .orFail(() => next(new IncorrectDataError('Пользователь не найден')))
     .then((user) => bcrypt.compare(password, user.password)
     // eslint-disable-next-line consistent-return
       .then((matched) => {
         if (matched) {
           return user;
         }
-        res.status(INCORRECT_DATA).send({ message: 'Пользователь не найден' });
+        next(new IncorrectDataError('Пользователь не найден'));
       }))
     .then((user) => {
       const token = jsonwebtoken.sign(
@@ -134,7 +130,7 @@ const getInformationUsers = (req, res, next) => {
   const userId = req.user._id;
   User
     .findById(userId)
-    .orFail(() => res.status(404).send({ message: 'Пользователь не найден' }))
+    .orFail(() => next(new NotFoundError('Not found')))
     .then((users) => res.status(200).send(users))
     .catch((err) => {
       next(err);

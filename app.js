@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 const express = require('express');
-const { celebrate, Joi } = require('celebrate');
 /* const path = require('path'); */
 const BodyParser = require('body-parser');
 const validationErrors = require('celebrate').errors;
+const NotFoundError = require('./errors/NotFoundError');
 
 const usersRouter = require('./routes/users'); // импортируем роутер
 const cardsRouter = require('./routes/cards');
-const { ERROR_NOT_FOUND, URL_REGEXP } = require('./config');
-const { login, createUser } = require('./controllers/users');
+const signupRouter = require('./routes/signup');
+const signInRouter = require('./routes/signin');
 const errorHandler = require('./middlewares/error-handler');
 const limiter = require('./middlewares/limiter');
 
@@ -25,29 +25,17 @@ app.use(limiter);
 // app.use(express.static(path.join(__dirname, "pablic"))); для подключения фронта
 
 // подключаем мидлвары, роуты и всё остальное...
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
 
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(URL_REGEXP),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), createUser);
+app.use('/signup', signupRouter);
+
+app.use('/signin', signInRouter);
 
 app.use('/users', usersRouter); // Подключаем роутеры
 
 app.use('/cards', cardsRouter);
 
-app.use('*', (req, res) => {
-  res.status(ERROR_NOT_FOUND).send({ message: 'URL does not exist' });
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('URL does not exist'));
 });
 
 app.use(validationErrors());

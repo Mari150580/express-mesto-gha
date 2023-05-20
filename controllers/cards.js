@@ -1,5 +1,7 @@
 const Card = require('../models/card');
-const { ERROR_BAD_REQUEST, ERROR_NOT_FOUND } = require('../config');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const AccessRightsError = require('../errors/AccessRightsError');
 
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -7,7 +9,7 @@ const createCard = (req, res, next) => {
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Error validation card' });
+        next(new BadRequestError('Error validation card'));
       } else {
         next(err);
       }
@@ -22,7 +24,7 @@ const deleteCard = async (req, res, next) => {
       owner: req.user._id,
     });
     if (deletedCard.deletedCount === 0) {
-      res.status(403).send({ message: 'Ошибка доступа! Карточка с данным не принадлежит пользователю' });
+      next(new AccessRightsError('Ошибка доступа! Карточка с данным не принадлежит пользователю'));
     } else {
       return res
         .status(200)
@@ -30,7 +32,7 @@ const deleteCard = async (req, res, next) => {
     }
   } catch (err) {
     if (err.name === 'DocumentNotFoundError') { // проверка _id не существует в базе
-      res.status(ERROR_NOT_FOUND).send({ message: 'Not found' });
+      next(new NotFoundError('Not found'));
     }
     next(err);
   }
@@ -60,9 +62,9 @@ const likeCard = (req, res, next) => {
     .catch((err) => {
       // проверка _id не валидный
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Not found' });
+        next(new BadRequestError('Not found'));
       } else if (err.name === 'Error') { // проверка _id не существует в базе
-        res.status(ERROR_NOT_FOUND).send({ message: 'Not found' });
+        next(new NotFoundError('Not found'));
       } else {
         next(err);
       }
@@ -85,9 +87,9 @@ const dislikeCard = (req, res, next) => {
     .catch((err) => {
       // проверка _id не валидный
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Not found' });
+        next(new BadRequestError('Not found'));
       } else if (err.name === 'Error') { // проверка _id не существует в базе
-        res.status(ERROR_NOT_FOUND).send({ message: 'Not found' });
+        next(new NotFoundError('Not found'));
       } else {
         next(err);
       }
