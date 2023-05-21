@@ -32,7 +32,7 @@ const deleteCard = async (req, res, next) => {
     }
   } catch (err) {
     if (err.name === 'DocumentNotFoundError') { // проверка _id не существует в базе
-      next(new NotFoundError('Not found'));
+      return next(new NotFoundError('Not found'));
     }
     next(err);
   }
@@ -55,7 +55,7 @@ const likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new Error('Card not found');
+        throw next(new NotFoundError('Card not found'));
       }
       res.status(200).send({ data: card });
     })
@@ -80,7 +80,7 @@ const dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new Error('Card not found');
+        throw next(new NotFoundError('Card not found'));
       }
       res.status(200).send({ data: card });
     })

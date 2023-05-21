@@ -5,7 +5,7 @@ const User = require('../models/user');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const UserExistsError = require('../errors/UserExistsError');
-const IncorrectDataError = require('../errors/IncorrectDataError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const createUser = (req, res, next) => {
   const {
@@ -45,7 +45,7 @@ const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     . then((user) => {
       if (!user) {
-        throw new Error('User not found');
+        throw next(new NotFoundError('User not found'));
       }
       res.status(200).send({ data: user });
     })
@@ -104,14 +104,14 @@ const login = (req, res, next) => {
   // data.token, сроком на неделю, сверка паролей
   User
     .findOne({ email }).select('+password')
-    .orFail(() => next(new IncorrectDataError('Пользователь не найден')))
+    .orFail(() => next(new UnauthorizedError('Неправильные почта или пароль')))
     .then((user) => bcrypt.compare(password, user.password)
     // eslint-disable-next-line consistent-return
       .then((matched) => {
         if (matched) {
           return user;
         }
-        next(new IncorrectDataError('Пользователь не найден'));
+        throw new UnauthorizedError('Пользователь не найден');
       }))
     .then((user) => {
       const token = jsonwebtoken.sign(
